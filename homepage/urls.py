@@ -5,6 +5,6 @@ from .views import  StockRecordListView, tableView
 
 urlpatterns = [
     path('',TemplateView.as_view(template_name ='homepage/index.html')),
-    path('stocks/<name>',tableView, name='stock_record_table')
+    path('stocks/<name>',tableView, name='stock_record_table'),
 
 ]

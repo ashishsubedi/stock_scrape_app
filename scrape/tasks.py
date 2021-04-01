@@ -109,4 +109,7 @@ def create_records_array_to_dict(data):
     mappings[record_to_model_map[6]] = int(mappings[record_to_model_map[6]])
     print(mappings)
     return mappings
-
+@celery_app.task
+def scrape_all_symbols(symbols):
+    for symbol in symbols:
+        scrape.delay(symbol)

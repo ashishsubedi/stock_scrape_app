@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django_render_partial',
     'django_tables2',
     "django_ajax_tables",
+    'django_celery_beat',
+
 
 
 ]
@@ -81,7 +83,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'stock_scrape.wsgi.application'
-
+ASGI_APPLICATION = 'stock_scrape.asgi..application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -118,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kathmandu'
 
 USE_I18N = True
 
@@ -141,3 +143,6 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BROKER_URL = 'redis://localhost:6379'
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
