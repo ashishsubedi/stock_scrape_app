@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+
+    <form class="form-inline">
+        <input type="text" class="form-control mb-2 mr-sm-2" id="symbol" placeholder="Symbol">
+        <button type="submit" class="btn btn-primary mb-2">Show</button>
+    </form>
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Logs</span>
+        </div>
+        <textarea id="logs_area" readonly class="form-control" aria-label="With textarea"></textarea>
+    </div>
+    <div id="table"></div>
+    <div id="plot">
+
+    </div>
+</div>
+{% endblock %}

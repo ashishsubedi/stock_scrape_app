@@ -39,7 +39,7 @@ print(date_to, date_from)
 
 
 @celery_app.task
-def scrape(symbol):
+def scrape(symbol,date_from=date_from,date_to=date_to):
 
     try:
         print(f"Started extracting {symbol}.. ")
@@ -66,25 +66,21 @@ def scrape(symbol):
         records = []
 
         print(f"Writing to {symbol}-{str(date_from)}-{str(date_to)}...")
-        with open(f"{symbol}-{str(date_from)}-{str(date_to)}.csv", 'w') as f:
-            headers = 'S.N.	Date	No of Transactions	Max Price	Min Price	Closing Price	Traded Shares	Total Amount	Prev. Closing	Difference Rs.	% Change'.split(
-                '\t')
-            f.write(",".join(headers)+'\n')
-            stock,created = Stock.objects.get_or_create(name=symbol)
+        stock,created = Stock.objects.get_or_create(name=symbol)
 
-            for row in rows:
-                line = ''
-                cols = row.find_all('td')
-                cols = [ele.label.text.strip() for ele in cols]
-                line = ','.join(cols) + '\n'
-                if not created:
-                    StockRecord.objects.filter(stock=stock).delete()
+        for row in rows:
+            line = ''
+            cols = row.find_all('td')
+            cols = [ele.label.text.strip() for ele in cols]
+            line = ','.join(cols) + '\n'
+            if not created:
+                StockRecord.objects.filter(stock=stock).delete()
 
-                record = StockRecord(**create_records_array_to_dict(cols),stock=stock)
-                # record.save()
-                records.append(record)
-                f.write(line)
-            StockRecord.objects.bulk_create(records)
+            record = StockRecord(**create_records_array_to_dict(cols),stock=stock)
+            # record.save()
+            records.append(record)
+            # f.write(line)
+        StockRecord.objects.bulk_create(records)
 
         print(f"Write Complete {symbol}-{str(date_from)}-{str(date_to)}...")
 
