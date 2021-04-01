@@ -1,0 +1,11 @@
+{% extends "scrape/base.html" %}
+
+{% block content %}
+    
+    <h2>Stock Records for {{ object.name}} </h2>
+    <ul>
+        {% for record in object.records.all %}
+            <li>{{ record.date }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
