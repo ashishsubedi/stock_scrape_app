@@ -34,16 +34,18 @@ date_to = datetime.now().date()
 date_from = (date_to-timedelta(days=days))
 print(date_to, date_from)
 
-
-# driver = webdriver.Chrome(options=option)
-
+with open('scrape/symbols.json') as f:
+    symbols_json = json.load(f)
 
 @celery_app.task
 def scrape(symbol,date_from=date_from,date_to=date_to):
-
     try:
-        print(f"Started extracting {symbol}.. ")
+        driver = None
+        if symbol not in symbols_json['symbols']:
+            raise Exception("Symbol {symbol} doesn't exist!")
         driver = webdriver.Chrome(options=option)
+
+        print(f"Started extracting {symbol}.. ")
 
         url = f'https://www.nepalipaisa.com/CompanyDetail.aspx?quote={symbol}'
         driver.get(url)
@@ -57,7 +59,7 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
         driver.find_element_by_id('txtToDate').send_keys(str(date_to))
         driver.find_element_by_id('btnSearchPriceHistory').click()
         time.sleep(2)
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        soup = BeautifulSoup(driver.page_source, 'lxml')
         table = soup.find('table', {'id': 'tblFloorList'})
 
         tbody = table.find('tbody')
@@ -66,20 +68,20 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
         records = []
 
         print(f"Writing to {symbol}-{str(date_from)}-{str(date_to)}...")
+
         stock,created = Stock.objects.get_or_create(name=symbol)
 
         for row in rows:
-            line = ''
+
             cols = row.find_all('td')
             cols = [ele.label.text.strip() for ele in cols]
-            line = ','.join(cols) + '\n'
+        
             if not created:
                 StockRecord.objects.filter(stock=stock).delete()
 
             record = StockRecord(**create_records_array_to_dict(cols),stock=stock)
-            # record.save()
             records.append(record)
-            # f.write(line)
+        
         StockRecord.objects.bulk_create(records)
 
         print(f"Write Complete {symbol}-{str(date_from)}-{str(date_to)}...")
@@ -87,7 +89,8 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
     except Exception as e:
         print(e)
     finally:
-        driver.close()
+        if driver:
+            driver.close()
         print(f"Closed Driver for {symbol}")
 
 
@@ -111,5 +114,7 @@ def create_records_array_to_dict(data):
     return mappings
 @celery_app.task
 def scrape_all_symbols(symbols):
-    for symbol in symbols:
-        scrape.delay(symbol)
+    n = int(.4 *len(symbols))
+    print(n)
+    scrape.chunks(symbols,n)
+    
