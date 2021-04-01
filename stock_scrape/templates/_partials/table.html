@@ -1,0 +1,10 @@
+{% load ajax_table %}
+
+<div>
+    {% if object_list %} -->
+        {% ajax_table "table_ajax" "stock_record_table" "NICA" %}
+    {% else %}
+        <br>
+        <h4>No Data To Show</h4>
+    {% endif %}
+</div>

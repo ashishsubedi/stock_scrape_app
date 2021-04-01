@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load ajax_table %}
 
 {% block content %}
 <div class="container">
 
     <div class="form-inline">
         {% csrf_token %}
-        <input id="symbol" type="text" class="form-control mb-2 mr-sm-2" id="symbol" placeholder="Symbol">
+        <input id="symbol" type="text" class="form-control mb-2 mr-sm-2" id="symbol" required placeholder="Symbol">
         <button id="scrape" type="submit" class="btn btn-primary mb-2">Get Data</button>
     </div>
     <div class="input-group">
@@ -14,7 +15,13 @@
         </div>
         <textarea id="logs_area" readonly class="form-control" aria-label="With textarea"></textarea>
     </div>
-    <div id="table"></div>
+    <div id="table">
+        <!-- {% include '_partials/table.html' %} -->
+        
+        {% ajax_table "table_ajax" "stock_record_table" name='None' %}
+
+
+    </div>
     <div id="plot">
         {% include '_partials/plot.html' %}
 
@@ -49,8 +56,8 @@
             method: 'POST',
             data: JSON.stringify({ symbol }),
             success: function (data, status) {
-                console.log(data)
                 $('#logs_area').prepend(`[${Date()}] ${data.status} - ${data.message}\n`)
+                update_table_ajax(symbol,'stocks/')
             },
             error: function (xhr, status, err) {
                 console.error(err)

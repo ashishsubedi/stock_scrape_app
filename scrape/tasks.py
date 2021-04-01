@@ -106,7 +106,7 @@ def create_records_array_to_dict(data):
     mappings['date'] = datetime.strptime(data[1],'%Y-%m-%d')
     for i,val in enumerate(data[2:9]):
         mappings[record_to_model_map[i+2]] = float(val)
-    mappings[record_to_model_map[7]] = int(mappings[record_to_model_map[7]])
+    mappings[record_to_model_map[6]] = int(mappings[record_to_model_map[6]])
     print(mappings)
     return mappings
 

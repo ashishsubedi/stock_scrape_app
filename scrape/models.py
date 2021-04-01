@@ -16,8 +16,8 @@ class StockRecord(models.Model):
     max_price = models.FloatField(verbose_name="Max Price")
     min_price = models.FloatField(verbose_name="Min Price")
     close_price = models.FloatField(verbose_name="Close Price")
-    traded_shares = models.FloatField(verbose_name="Traded Shares")
-    total_amt = models.IntegerField(verbose_name="Total Amount")
+    traded_shares = models.IntegerField(verbose_name="Traded Shares")
+    total_amt = models.FloatField(verbose_name="Total Amount")
     prev_close = models.FloatField(verbose_name="Previous Close Price")
 
     stock = models.ForeignKey(Stock,related_name='records',on_delete=models.CASCADE)

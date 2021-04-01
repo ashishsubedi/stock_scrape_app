@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     #Third party
     'django_celery_results',
     'django_render_partial',
+    'django_tables2',
+    "django_ajax_tables",
+
 
 ]
 
