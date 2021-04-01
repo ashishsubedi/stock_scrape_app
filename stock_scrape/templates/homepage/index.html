@@ -3,10 +3,11 @@
 {% block content %}
 <div class="container">
 
-    <form class="form-inline">
-        <input type="text" class="form-control mb-2 mr-sm-2" id="symbol" placeholder="Symbol">
-        <button type="submit" class="btn btn-primary mb-2">Show</button>
-    </form>
+    <div class="form-inline">
+        {% csrf_token %}
+        <input id="symbol" type="text" class="form-control mb-2 mr-sm-2" id="symbol" placeholder="Symbol">
+        <button id="scrape" type="submit" class="btn btn-primary mb-2">Get Data</button>
+    </div>
     <div class="input-group">
         <div class="input-group-prepend">
             <span class="input-group-text">Logs</span>
@@ -15,7 +16,47 @@
     </div>
     <div id="table"></div>
     <div id="plot">
+        {% include '_partials/plot.html' %}
 
     </div>
 </div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+    return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    $('#scrape').on('click', function (e) {
+        e.preventDefault();
+        const symbol = $('#symbol').val()
+        console.log(symbol)
+        $.ajax({
+            url: `/scrape/${symbol}/`,
+            contentType: 'application/json',
+            headers: { 'X-CSRFToken': csrftoken },
+            method: 'POST',
+            data: JSON.stringify({ symbol }),
+            success: function (data, status) {
+                console.log(data)
+                $('#logs_area').prepend(`[${Date()}] ${data.status} - ${data.message}\n`)
+            },
+            error: function (xhr, status, err) {
+                console.error(err)
+            }
+        })
+
+    })
+</script>
 {% endblock %}

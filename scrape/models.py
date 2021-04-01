@@ -9,6 +9,8 @@ class Stock(models.Model):
     
 
 class StockRecord(models.Model):
+
+
     date = models.DateField()
     transactions_num = models.FloatField(verbose_name="No of Transactions")
     max_price = models.FloatField(verbose_name="Max Price")
@@ -20,6 +22,8 @@ class StockRecord(models.Model):
 
     stock = models.ForeignKey(Stock,related_name='records',on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['-date']
     def get_change(self):
         return self.close_price - self.prev_close
     def get_change_percent(self):

@@ -2,8 +2,8 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import IndexView
+from .views import ScrapeView
 
 urlpatterns = [
-    path('<pk>/',IndexView.as_view())
+    path('<name>/',ScrapeView.as_view())
 ]
