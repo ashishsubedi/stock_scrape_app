@@ -16,13 +16,17 @@ class StockRecordListView(SingleTableView):
 def tableView(request,name):
     if name == "":
         name = request.GET.get('name','None')
+    try:
+        # stock = Stock.objects.filter(name=name).first()
 
-    stock = Stock.objects.filter(name=name).first()
-    if stock:
-        table = StockRecordTable(stock.records.all())
+        # if stock:
+        records = StockRecord.objects.select_related('stock').filter(stock__name=name)
+        table = StockRecordTable(records)
         RequestConfig(request).configure(table)
     
         return HttpResponse(table.as_html(request))
-    table = StockRecordTable('')
-    RequestConfig(request).configure(table)
-    return HttpResponse(table.as_html(request))
+    except Exception as e:
+        print("Error",e)
+        table = StockRecordTable('')
+        RequestConfig(request).configure(table)
+        return HttpResponse(table.as_html(request))

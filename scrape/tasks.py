@@ -42,7 +42,7 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
     try:
         driver = None
         if symbol not in symbols_json['symbols']:
-            raise Exception("Symbol {symbol} doesn't exist!")
+            raise Exception(f"Symbol {symbol} doesn't exist!")
         driver = webdriver.Chrome(options=option)
 
         print(f"Started extracting {symbol}.. ")
@@ -114,7 +114,7 @@ def create_records_array_to_dict(data):
     return mappings
 @celery_app.task
 def scrape_all_symbols(symbols):
-    n = int(.4 *len(symbols))
+    n = int(.2 *len(symbols))
     print(n)
-    scrape.chunks(symbols,n)
+    scrape.chunks(zip(symbols),n)()
     

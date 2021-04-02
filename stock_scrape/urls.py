@@ -19,6 +19,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('scrape/',include('scrape.urls')),
-    path('',include('homepage.urls'))
+    path('',include('homepage.urls')),
+    path('django_query_profiler/', include('django_query_profiler.client.urls'))
+
 
 ]

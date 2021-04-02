@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+from django_query_profiler.settings import *
+from django_query_profiler.query_profiler_storage import QueryProfilerLevel
+
+def DJANGO_QUERY_PROFILER_LEVEL_FUNC(request) -> Optional[QueryProfilerLevel]:
+  return QueryProfilerLevel.QUERY
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +54,7 @@ INSTALLED_APPS = [
     'django_tables2',
     "django_ajax_tables",
     'django_celery_beat',
+    'django_query_profiler',
 
 
 
@@ -61,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_query_profiler.client.middleware.QueryProfilerMiddleware',
 ]
 
 ROOT_URLCONF = 'stock_scrape.urls'
@@ -90,7 +98,7 @@ ASGI_APPLICATION = 'stock_scrape.asgi..application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        "ENGINE": "django_query_profiler.django.db.backends.sqlite3",
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
