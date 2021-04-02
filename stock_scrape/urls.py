@@ -16,11 +16,26 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from django.conf.urls.static import static
+from django.conf import settings
+
+# Load demo plotly apps - this triggers their registration
+import homepage.dash    # pylint: disable=unused-import
+
+from django_plotly_dash.views import add_to_session
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('scrape/',include('scrape.urls')),
     path('',include('homepage.urls')),
-    path('django_query_profiler/', include('django_query_profiler.client.urls'))
+    path('django_plotly_dash/', include('django_plotly_dash.urls')),
+    path('django_query_profiler/', include('django_query_profiler.client.urls')),
+
+    path('demo-session-var', add_to_session, name="session-variable-example"),
 
 
 ]
+
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

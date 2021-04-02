@@ -15,8 +15,9 @@ import os
 from django_query_profiler.settings import *
 from django_query_profiler.query_profiler_storage import QueryProfilerLevel
 
+
 def DJANGO_QUERY_PROFILER_LEVEL_FUNC(request) -> Optional[QueryProfilerLevel]:
-  return QueryProfilerLevel.QUERY
+    return QueryProfilerLevel.QUERY
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,14 +49,15 @@ INSTALLED_APPS = [
     # Custom
     'scrape',
 
-    #Third party
+    # Third party
     'django_celery_results',
     'django_render_partial',
     'django_tables2',
     "django_ajax_tables",
     'django_celery_beat',
     'django_query_profiler',
-
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    # 'channels',
 
 
 ]
@@ -76,7 +78,7 @@ ROOT_URLCONF = 'stock_scrape.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ BASE_DIR / 'stock_scrape' / 'templates'],
+        'DIRS': [BASE_DIR / 'stock_scrape' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,7 +86,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                
+
             ],
         },
     },
@@ -154,3 +156,20 @@ CELERY_BROKER_URL = 'redis://localhost:6379'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             'hosts': [('127.0.0.1', 6379),],
+#         },
+#     },
+# }
+
+PLOTLY_COMPONENTS = [
+
+    # Common components
+    'dash_core_components',
+    'dash_html_components',
+    'dash_renderer',
+
+]
