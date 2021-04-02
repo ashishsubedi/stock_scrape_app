@@ -32,22 +32,25 @@ from .chart import plot_MACD_signal, plot_close_price, MACD
 app = DjangoDash('MACD_plot')  # replaces dash.Dash
 
 
-
 app.layout = html.Div([
 
     html.Div(['Logs:',
-            dcc.Textarea(id='logs_area',
-                        readOnly=True,
-                        style={
-                            'width': '100%', 'height': 100}, value=''
-                        ),
+              dcc.Textarea(id='logs_area',
+                           readOnly=True,
+                           style={
+                               'width': '100%', 'height': 100}, value='',
+                           persistence=True,
+                           persistence_type='session'
 
-            ]),
+                           ),
+
+
+              ]),
     html.Br(),
     html.Div([
 
         dcc.Input(id='symbol_name', value='NICA', type='text'),
-        dbc.Button('Get Data', id='submit-val', n_clicks='0',color='primary'),
+        dbc.Button('Get Data', id='submit-val', n_clicks='0', color='primary'),
     ]),
     dcc.Graph(id='plot-div'),
     html.Div(id="table"),
@@ -62,7 +65,8 @@ app.layout = html.Div([
     ]
 )
 def update_figure(_, symbol):
-    if not symbol: return 
+    if not symbol:
+        return
     symbol = symbol.upper()
 
     qs = StockRecord.objects.filter(stock__name=symbol)
@@ -70,11 +74,12 @@ def update_figure(_, symbol):
     df, macd, signal = MACD(df, column='close_price')
 
     fig = make_subplots(rows=2, cols=1,
-    subplot_titles=("Close Price with Buy Sell Signal", "MACD and Signal")
-    )
+                        subplot_titles=(
+                            "Close Price with Buy Sell Signal", "MACD and Signal")
+                        )
 
-    fig = plot_close_price(df,column='close_price',name=symbol,fig=fig)
-    fig = plot_MACD_signal(df,macd,signal,name=symbol,fig=fig)
+    fig = plot_close_price(df, column='close_price', name=symbol, fig=fig)
+    fig = plot_MACD_signal(df, macd, signal, name=symbol, fig=fig)
     fig.update_layout(height=1000)
 
     return fig
@@ -88,12 +93,14 @@ def update_figure(_, symbol):
     ]
 )
 def update_table(_, symbol):
-    if not symbol: return 
+    if not symbol:
+        return
 
     symbol = symbol.upper()
 
-
     qs = StockRecord.objects.filter(stock__name=symbol)
+    if not qs.exists():
+        scrape.delay(symbol)
     df = read_frame(qs)
     return DataTable(
         id='dash-table',
@@ -116,7 +123,7 @@ def update_table(_, symbol):
     ]
 )
 def update_logs(_, text, symbol):
-    if not symbol: 
+    if not symbol:
         new_text = f'[{datetime.datetime.now()}] FAILED - INVALID SYMBOL\n'
         text = new_text + text
 
@@ -127,7 +134,7 @@ def update_logs(_, text, symbol):
     if not symbol in symbols_json['symbols']:
         new_text = f'[{datetime.datetime.now()}] FAILED - INVALID SYMBOL\n'
     else:
-        new_text = f'[{datetime.datetime.now()}] SUCCESS - {symbol} LOADED\n'
+        new_text = f'[{datetime.datetime.now()}] SUCCESS - {symbol} LOADED. If not shown, try again in few minutes.\n'
 
     text = new_text + text
 
