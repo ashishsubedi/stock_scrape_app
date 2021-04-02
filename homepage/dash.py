@@ -5,6 +5,7 @@ from dash_table import DataTable
 from dash.dependencies import Input, Output, State
 
 from django_plotly_dash import DjangoDash
+import dash_bootstrap_components as dbc
 
 import plotly.graph_objects as go
 
@@ -28,7 +29,7 @@ from scrape.tasks import scrape, symbols_json
 from .chart import plot_MACD_signal, plot_close_price, MACD
 
 
-app = DjangoDash('MACD_plot')   # replaces dash.Dash
+app = DjangoDash('MACD_plot')  # replaces dash.Dash
 
 
 
@@ -46,7 +47,7 @@ app.layout = html.Div([
     html.Div([
 
         dcc.Input(id='symbol_name', value='NICA', type='text'),
-        html.Button('Get Data', id='submit-val', n_clicks='0'),
+        dbc.Button('Get Data', id='submit-val', n_clicks='0',color='primary'),
     ]),
     dcc.Graph(id='plot-div'),
     html.Div(id="table"),
