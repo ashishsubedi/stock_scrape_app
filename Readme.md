@@ -3,6 +3,7 @@ Web app that scrapes Nepse stocks and perform technical analysis.
 
 ### Technology Used
 - Django
+- Selenium and Beautiful Soup 4
 - Plotly Dash
 - Celery
 - Celery beat
