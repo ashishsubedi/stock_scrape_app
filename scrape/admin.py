@@ -19,6 +19,6 @@ class StockRecordInline(admin.TabularInline):
 
 class StockAdmin(admin.ModelAdmin):
     inlines = [StockRecordInline]
-    readonly_fields = ['name','updated_at','created_at']
+    readonly_fields = ['name','updated_at','created_at','state']
 
 admin.site.register(Stock, StockAdmin)

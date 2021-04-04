@@ -29,6 +29,11 @@ from scrape.tasks import scrape, symbols_json
 from .chart import plot_MACD_signal, plot_close_price, MACD
 
 
+
+
+def generate_dropdown_options():
+    return [dict(zip(('label','value'),(symbol,symbol))) for symbol in symbols_json['symbols']]
+
 app = DjangoDash('MACD_plot')  # replaces dash.Dash
 
 
@@ -48,8 +53,11 @@ app.layout = html.Div([
               ]),
     html.Br(),
     html.Div([
-
-        dcc.Input(id='symbol_name', value='NICA', type='text'),
+        dcc.Dropdown(
+            id='symbol_name',
+            options=generate_dropdown_options(),
+            value='NICA',
+        ),
         dbc.Button('Get Data', id='submit-val', n_clicks='0', color='primary'),
     ]),
     dcc.Graph(id='plot-div'),
@@ -99,8 +107,7 @@ def update_table(_, symbol):
     symbol = symbol.upper()
 
     qs = StockRecord.objects.filter(stock__name=symbol)
-    if not qs.exists():
-        scrape.delay(symbol)
+
     df = read_frame(qs)
     return DataTable(
         id='dash-table',
@@ -133,18 +140,21 @@ def update_logs(_, text, symbol):
     update_msg = ''
     try:
         stock = Stock.objects.get(name=symbol)
-        print(stock.need_to_update())
-        if stock.need_to_update():
+        if stock.state == 'fetch':
+            update_msg = f"FAILED - {symbol} Fetching Data. Please try again in few minutes."
+        elif stock.state == 'ready' and stock.need_to_update():
             scrape.delay(symbol)
+            stock.state = 'fetch'
+            stock.save()
+
             update_msg = f"SUCCESS - {symbol} LOADED. Data may be old. Please try again in few minutes."
         else:
             update_msg = f"SUCCESS - {symbol} LOADED."
 
-
     except:
+        stock = Stock.objects.create(name=symbol)
         scrape.delay(symbol)
         update_msg = f"FAILED - {symbol} Fetching Data. Please try again in few minutes."
-
 
     if not symbol in symbols_json['symbols']:
         new_text = f'[{datetime.datetime.now()}] FAILED - INVALID SYMBOL\n'

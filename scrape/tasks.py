@@ -71,6 +71,7 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
 
         stock,created = Stock.objects.get_or_create(name=symbol)
 
+
         for row in rows:
 
             cols = row.find_all('td')
@@ -82,9 +83,12 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
             record = StockRecord(**create_records_array_to_dict(cols),stock=stock)
             records.append(record)
         
-        StockRecord.objects.bulk_create(records)
-
+        created = StockRecord.objects.bulk_create(records)
+ 
+        stock.state = 'ready'
+        stock.save()
         print(f"Write Complete {symbol}-{str(date_from)}-{str(date_to)}...")
+  
 
     except Exception as e:
         print(e)
@@ -110,8 +114,8 @@ def create_records_array_to_dict(data):
     for i,val in enumerate(data[2:9]):
         mappings[record_to_model_map[i+2]] = float(val)
     mappings[record_to_model_map[6]] = int(mappings[record_to_model_map[6]])
-    print(mappings)
     return mappings
+    
 @celery_app.task
 def scrape_all_symbols(symbols):
     n = int(.2 *len(symbols))

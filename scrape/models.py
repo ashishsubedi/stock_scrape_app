@@ -4,7 +4,15 @@ from django.utils import timezone
 
 
 class Stock(models.Model):
+    STATE_CHOICE = [
+        ('fetch','fetch'),
+        ('ready','ready'),
+        ('error','error')
+    ]
     name = models.CharField(max_length=10)
+
+    state = models.CharField(max_length=10,choices=STATE_CHOICE,default='fetch')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
