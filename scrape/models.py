@@ -1,11 +1,18 @@
 from django.db import models
 
+from django.utils import timezone
+
 
 class Stock(models.Model):
     name = models.CharField(max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+    def need_to_update(self):
+        return True if timezone.now() >= self.updated_at + timezone.timedelta(hours=8) else False
+
     
 
 class StockRecord(models.Model):
@@ -22,6 +29,8 @@ class StockRecord(models.Model):
 
     stock = models.ForeignKey(Stock,related_name='records',on_delete=models.CASCADE)
 
+
+
     class Meta:
         ordering = ['-date']
     def get_change(self):
@@ -29,3 +38,4 @@ class StockRecord(models.Model):
     def get_change_percent(self):
         return (self.close_price - self.prev_close)/(self.close_price*1.0)*100
 
+    

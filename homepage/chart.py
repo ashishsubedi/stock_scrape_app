@@ -40,10 +40,10 @@ def plot_MACD_signal(df, macd, signal, volume='Traded Shares', period_text='(12,
                   row=2, col=1
                   )
     fig.update_xaxes(title_text='Date')
-    fig.update_yaxes(title_text='MACD Value',row=2,col=1)
+    fig.update_yaxes(title_text='MACD Value', row=2, col=1)
     fig.update_layout(
         legend_title="Legend",
-     
+
         transition_duration=500
 
     )
@@ -87,9 +87,9 @@ def plot_close_price(df, column='Closing Price', plot_EMA=True, show_buy_sell=Tr
             opacity=0.7),
             row=1, col=1
         )
- 
+
     fig.update_xaxes(title_text='Date')
-    fig.update_yaxes(title_text='Close Price',row=1,col=1)
+    fig.update_yaxes(title_text='Close Price', row=1, col=1)
 
     return fig
 

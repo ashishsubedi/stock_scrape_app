@@ -130,11 +130,26 @@ def update_logs(_, text, symbol):
         return text
 
     symbol = symbol.upper()
+    update_msg = ''
+    try:
+        stock = Stock.objects.get(name=symbol)
+        print(stock.need_to_update())
+        if stock.need_to_update():
+            scrape.delay(symbol)
+            update_msg = f"SUCCESS - {symbol} LOADED. Data may be old. Please try again in few minutes."
+        else:
+            update_msg = f"SUCCESS - {symbol} LOADED."
+
+
+    except:
+        scrape.delay(symbol)
+        update_msg = f"FAILED - {symbol} Fetching Data. Please try again in few minutes."
+
 
     if not symbol in symbols_json['symbols']:
         new_text = f'[{datetime.datetime.now()}] FAILED - INVALID SYMBOL\n'
     else:
-        new_text = f'[{datetime.datetime.now()}] SUCCESS - {symbol} LOADED. If not shown, try again in few minutes.\n'
+        new_text = f'[{datetime.datetime.now()}] {update_msg}\n'
 
     text = new_text + text
 
