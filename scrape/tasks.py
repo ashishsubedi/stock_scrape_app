@@ -38,6 +38,9 @@ print(date_to, date_from)
 with open('scrape/symbols.json') as f:
     symbols_json = json.load(f)
 
+with open('scrape/watchlist.json') as f:
+    watchlist_json = json.load(f)
+
 @celery_app.task
 def scrape(symbol,date_from=date_from,date_to=date_to):
     try:
@@ -72,6 +75,8 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
 
         stock,created = Stock.objects.get_or_create(name=symbol)
         stock.updated_at = timedelta(days = -1)
+        stock.save()
+
 
         for row in rows:
 
@@ -94,6 +99,8 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
   
 
     except Exception as e:
+        stock,created = Stock.objects.get_or_create(name=symbol)
+        stock.delete()
         print(e)
     finally:
         if driver:
@@ -118,7 +125,9 @@ def create_records_array_to_dict(data):
         mappings[record_to_model_map[i+2]] = float(val)
     mappings[record_to_model_map[6]] = int(mappings[record_to_model_map[6]])
     return mappings
-    
+
+
+
 @celery_app.task
 def scrape_all_symbols(symbols):
     n = int(.2 *len(symbols))

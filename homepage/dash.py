@@ -24,7 +24,7 @@ from plotly.subplots import make_subplots
 
 import os
 
-from scrape.tasks import scrape, symbols_json
+from scrape.tasks import scrape, symbols_json, watchlist_json
 
 from .chart import plot_MACD_signal, plot_close_price, MACD
 
@@ -32,7 +32,7 @@ from .chart import plot_MACD_signal, plot_close_price, MACD
 
 
 def generate_dropdown_options():
-    return [dict(zip(('label','value'),(symbol,symbol))) for symbol in symbols_json['symbols']]
+    return  [dict(zip(('label','value'),(symbol,symbol))) for symbol in symbols_json['symbols']] 
 
 app = DjangoDash('MACD_plot')  # replaces dash.Dash
 
@@ -52,11 +52,12 @@ app.layout = html.Div([
 
               ]),
     html.Br(),
+    html.Div(id='dummy', style={'display':'none'}),
     html.Div([
         dcc.Dropdown(
             id='symbol_name',
             options=generate_dropdown_options(),
-            value='NICA',
+            value='ACLBSL',
         ),
         dbc.Button('Get Data', id='submit-val', n_clicks='0', color='primary'),
     ]),
@@ -73,6 +74,7 @@ app.layout = html.Div([
     ]
 )
 def update_figure(_, symbol):
+    print(symbol)
     if not symbol:
         return
     symbol = symbol.upper()
@@ -164,3 +166,35 @@ def update_logs(_, text, symbol):
     text = new_text + text
 
     return text
+
+
+@app.callback(
+    Output('dummy','children'),
+    [
+        Input('dummy', 'children'),
+    ],
+    state=[State('logs_area','value')]
+)
+def update_watchlists(_,text):
+    print(text)
+    for symbol in watchlist_json['symbols']:
+        
+        try:
+            stock = Stock.objects.get(name=symbol)
+            if stock.state == 'fetch':
+                update_msg = f"WATCHLIST - {symbol} Fetching Data. Please try again in few minutes."
+            elif stock.state == 'ready' and stock.need_to_update():
+                scrape.delay(symbol)
+                stock.state = 'fetch'
+                stock.save()
+                update_msg = f"WATCHLIST - {symbol} LOADED. Data may be old. Please try again in few minutes."
+            else:
+                update_msg = f"WATCHLIST - {symbol} LOADED. Data may be old. Please try again in few minutes."
+
+        
+        except:
+            scrape.delay(symbol)
+            update_msg = f"WATCH - {symbol} Fetching Data."
+    
+    new_text = f'[{datetime.datetime.now()}] {update_msg}\n'
+    return ''
