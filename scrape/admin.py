@@ -18,6 +18,7 @@ class StockRecordInline(admin.TabularInline):
 
 
 class StockAdmin(admin.ModelAdmin):
+    save_on_top = True
     inlines = [StockRecordInline]
     readonly_fields = ['name','updated_at','created_at','state']
 

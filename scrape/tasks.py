@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
 from datetime import datetime, timedelta
+from django.utils import timezone
 from bs4 import BeautifulSoup
 
 from stock_scrape import celery_app
@@ -70,7 +71,7 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
         print(f"Writing to {symbol}-{str(date_from)}-{str(date_to)}...")
 
         stock,created = Stock.objects.get_or_create(name=symbol)
-
+        stock.updated_at = timedelta(days = -1)
 
         for row in rows:
 
@@ -86,6 +87,8 @@ def scrape(symbol,date_from=date_from,date_to=date_to):
         created = StockRecord.objects.bulk_create(records)
  
         stock.state = 'ready'
+        stock.updated_at = timezone.now()
+
         stock.save()
         print(f"Write Complete {symbol}-{str(date_from)}-{str(date_to)}...")
   
