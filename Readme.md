@@ -1,3 +1,5 @@
+# NOTE: Discontinued
+
 ## Stock Scrape App
 Web app that scrapes Nepse stocks and perform technical analysis.
 
